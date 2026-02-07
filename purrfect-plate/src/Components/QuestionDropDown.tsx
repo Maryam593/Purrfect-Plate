@@ -21,104 +21,94 @@ const QuestionDropDown = ({ open, close }: any) => {
       return
     }
 
-    setLoading(true);
-    setFood(null);
+    setLoading(true)
+    setFood(null)
 
     try {
       const res = await fetch(
         "https://purrfect-plate-backend-1.onrender.com/api/catData",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name, breed, image: "" }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, breed }),
         }
-      );
+      )
 
-      if (!res.ok) {
-        throw new Error("Server response was not ok");
-      }
+      const data = await res.json()
 
-      const data = await res.json();
-
-      // Stable Anime Image Logic
-      const visualPrompt = data.cat.visual_prompt || `Studio Ghibli style anime art, delicious cat food bowl for a ${breed} cat, vibrant colors`;
-      const encodedPrompt = encodeURIComponent(visualPrompt);
+      // 100% Anime Prompt Logic
+      const animeStyle = "masterpiece, 2D anime style art, studio ghibli aesthetic, cel shaded, vibrant colors, hand-drawn, no realism, no 3d, no photo";
+      const dish = data.cat.food || "tasty cat treats";
+      const finalPrompt = encodeURIComponent(`${animeStyle}, a bowl of ${dish} for a ${breed} cat`);
       
-      // 'flux' model use kiya hai jo 502 errors kam deta hai aur seed random rakha hai
-      const generatedImage = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&model=flux&seed=${Math.floor(Math.random() * 99999)}`;
+      const generatedImage = `https://image.pollinations.ai/prompt/${finalPrompt}?width=512&height=512&nologo=true&model=flux&seed=${Math.floor(Math.random() * 10000)}`;
 
       setFood({
         image: generatedImage,
-        food: data.cat.food
-      });
+        food: dish
+      })
 
     } catch (err) {
-      console.log("API error:", err);
-      alert("Backend is sleeping or API key leaked. Wake it up first!");
+      console.log("Error:", err)
+      alert("Check if Render Backend is active!")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={close}></div>
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 font-mono">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={close}></div>
 
       <div className="relative w-full max-w-sm bg-[#c9db94] border-[6px] border-[#2e3a1f] p-6 text-[#2e3a1f] animate-drop pixel-box shadow-[8px_8px_0px_0px_rgba(46,58,31,1)]">
         <div className="h-3 bg-[#2e3a1f] mb-4"></div>
-        <p className="text-center text-[16px] mb-4 font-bold tracking-widest uppercase">Cat Menu</p>
+        <p className="text-center text-[16px] mb-6 font-bold uppercase italic">✨ Cat Menu ✨</p>
 
         <div className="flex flex-col gap-3 mb-6">
           <input 
             type="text" 
-            placeholder="Cat Name..." 
+            placeholder="CAT NAME..." 
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="p-3 bg-[#e8f0d1] border-4 border-[#2e3a1f] text-[14px] outline-none placeholder-[#2e3a1f]/40 font-mono"
+            className="p-3 bg-[#e8f0d1] border-4 border-[#2e3a1f] text-[12px] outline-none placeholder-[#2e3a1f]/40"
           />
           <input 
             type="text" 
-            placeholder="Breed (e.g. Bengal)" 
+            placeholder="BREED (e.g. BENGAL)..." 
             value={breed}
             onChange={(e) => setBreed(e.target.value)}
-            className="p-3 bg-[#e8f0d1] border-4 border-[#2e3a1f] text-[14px] outline-none placeholder-[#2e3a1f]/40 font-mono"
+            className="p-3 bg-[#e8f0d1] border-4 border-[#2e3a1f] text-[12px] outline-none placeholder-[#2e3a1f]/40"
           />
         </div>
 
-        <ul className="space-y-4 text-center">
-          <button 
-            disabled={loading}
-            className="w-full cursor-pointer bg-[#2e3a1f] text-[#c9db94] py-3 font-bold hover:scale-105 active:scale-95 transition-all disabled:opacity-50 text-[14px]" 
-            onClick={generateFood}
-          >
-            {loading ? "COOKING..." : "GENERATE FOOD ✨"}
-          </button>
-          
-          <li className="cursor-pointer text-[12px] underline decoration-2 underline-offset-4 font-bold" onClick={close}>
-            EXIT
-          </li>
-        </ul>
+        <button 
+          disabled={loading}
+          className="w-full bg-[#2e3a1f] text-[#c9db94] py-3 font-bold hover:brightness-125 transition-all disabled:opacity-50 text-[14px] mb-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]" 
+          onClick={generateFood}
+        >
+          {loading ? "COOKING..." : "GENERATE FOOD 🍲"}
+        </button>
+        
+        <p className="text-center cursor-pointer text-[10px] font-bold hover:underline" onClick={close}>[ CLOSE ]</p>
 
         {food && (
-          <div className="mt-6 flex flex-col items-center gap-3 border-t-4 border-dashed border-[#2e3a1f] pt-6 animate-in zoom-in duration-300">
-            <div className="relative p-1 bg-[#2e3a1f] rounded-xl shadow-lg">
+          <div className="mt-6 flex flex-col items-center gap-3 border-t-4 border-dashed border-[#2e3a1f] pt-6 animate-in zoom-in">
+            <div className="relative p-1 bg-[#2e3a1f] rounded-lg">
               <img
                 src={food.image}
-                alt="AI Anime Cat Food"
-                className="w-48 h-48 object-cover rounded-lg border-2 border-[#c9db94]"
-                // Fallback image logic agar 502 error aaye
+                alt="Anime Food"
+                referrerPolicy="no-referrer"
+                className="w-48 h-48 object-cover rounded border-2 border-[#c9db94]"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://i.pinimg.com/originals/82/30/11/823011a0f83691375d3368222955f756.gif";
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null; 
+                  // Giphy ka yeh link Access Denied nahi deta
+                  target.src = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2I0eHhndXp6ZnZ4eHhndXp6ZnZ4eHhndXp6ZnZ4eHhndXp6ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vS3pYI2H8XN56/giphy.gif";
                 }}
               />
             </div>
-            <div className="text-center">
-               <p className="text-[10px] uppercase tracking-tighter opacity-70">Chef's Special Recommendation</p>
-               <p className="text-[15px] font-black leading-tight italic">
-                  "{food.food}"
-               </p>
+            <div className="bg-[#2e3a1f] text-[#c9db94] px-4 py-1 rounded-full text-[12px] font-bold shadow-md">
+               {food.food}
             </div>
           </div>
         )}
