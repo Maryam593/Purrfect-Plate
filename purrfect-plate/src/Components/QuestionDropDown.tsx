@@ -74,7 +74,7 @@ const QuestionDropDown = ({ open, close }: any) => {
           />
           <input 
             type="text" 
-            placeholder="BREED (e.g. BENGAL)..." 
+            placeholder="BREED (e.g. BENG)..." 
             value={breed}
             onChange={(e) => setBreed(e.target.value)}
             className="p-3 bg-[#e8f0d1] border-4 border-[#2e3a1f] text-[12px] outline-none placeholder-[#2e3a1f]/40"
@@ -86,7 +86,7 @@ const QuestionDropDown = ({ open, close }: any) => {
           className="w-full bg-[#2e3a1f] text-[#c9db94] py-3 font-bold hover:brightness-125 transition-all disabled:opacity-50 text-[14px] mb-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]" 
           onClick={generateFood}
         >
-          {loading ? "COOKING..." : "GENERATE FOOD 🍲"}
+          {loading ? "COOKING..." : "GENERATE FOOD "}
         </button>
         
         <p className="text-center cursor-pointer text-[10px] font-bold hover:underline" onClick={close}>[ CLOSE ]</p>
