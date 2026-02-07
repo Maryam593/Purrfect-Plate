@@ -46,63 +46,84 @@ const QuestionDropDown = ({ open, close }: any) => {
 
       const data = await res.json()
 
+      // Naya Logic: AI Generated Anime Image
+      // Hum backend se visual_prompt mangwa rahe hain (Jo humne Gemini prompt mein set kiya tha)
+      const visualPrompt = data.cat.visual_prompt || `Studio Ghibli style, high quality anime art, delicious ${data.cat.food} for a ${breed} cat, vibrant colors`;
+      
+      const encodedPrompt = encodeURIComponent(visualPrompt);
+      
+      // Pollinations AI URL jo anime image generate karega
+      const generatedImage = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&seed=${Math.floor(Math.random() * 1000)}`;
+
       setFood({
-        // Yahan aap apni anime image ka link bhi daal sakti hain agar backend real photo bhej raha hai
-        image: data.cat.image || "https://path-to-your-anime-food.png",
+        image: generatedImage,
         food: data.cat.food
       })
 
     } catch (err) {
       console.log("API error:", err)
+      alert("Something went wrong. Please check if backend is running.")
     }
 
     setLoading(false)
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black/50" onClick={close}></div>
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={close}></div>
 
-      <div className="relative w-80 bg-[#c9db94] border-[6px] border-[#2e3a1f] p-6 text-[#2e3a1f] animate-drop pixel-box">
+      <div className="relative w-full max-w-sm bg-[#c9db94] border-[6px] border-[#2e3a1f] p-6 text-[#2e3a1f] animate-drop pixel-box shadow-[8px_8px_0px_0px_rgba(46,58,31,1)]">
         <div className="h-3 bg-[#2e3a1f] mb-4"></div>
-        <p className="text-center text-[14px] mb-4 font-bold">CAT MENU</p>
+        <p className="text-center text-[16px] mb-4 font-bold tracking-widest">CAT MENU</p>
 
         {/* Input Fields */}
-        <div className="flex flex-col gap-2 mb-6">
+        <div className="flex flex-col gap-3 mb-6">
           <input 
             type="text" 
             placeholder="Cat Name..." 
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="p-2 bg-transparent border-2 border-[#2e3a1f] text-[12px] outline-none placeholder-[#2e3a1f]/50"
+            className="p-3 bg-[#e8f0d1] border-4 border-[#2e3a1f] text-[14px] outline-none placeholder-[#2e3a1f]/40 font-mono"
           />
           <input 
             type="text" 
             placeholder="Breed (e.g. Bengal)" 
             value={breed}
             onChange={(e) => setBreed(e.target.value)}
-            className="p-2 bg-transparent border-2 border-[#2e3a1f] text-[12px] outline-none placeholder-[#2e3a1f]/50"
+            className="p-3 bg-[#e8f0d1] border-4 border-[#2e3a1f] text-[14px] outline-none placeholder-[#2e3a1f]/40 font-mono"
           />
         </div>
 
-        <ul className="space-y-4 text-center text-[12px]">
-          <li className="cursor-pointer bg-[#2e3a1f] text-white py-2 hover:opacity-80 transition-all" onClick={generateFood}>
-            {loading ? "COOKING..." : "GENERATE FOOD"}
+        <ul className="space-y-4 text-center">
+          <button 
+            disabled={loading}
+            className="w-full cursor-pointer bg-[#2e3a1f] text-[#c9db94] py-3 font-bold hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-[14px]" 
+            onClick={generateFood}
+          >
+            {loading ? "COOKING..." : "GENERATE FOOD ✨"}
+          </button>
+          
+          <li className="cursor-pointer text-[12px] underline decoration-2 underline-offset-4 font-bold" onClick={close}>
+            EXIT
           </li>
-          <li className="cursor-pointer border-b border-[#2e3a1f] inline-block" onClick={close}>Close</li>
         </ul>
 
-        {/* Food result */}
+        {/* AI Result Section */}
         {food && (
-          <div className="food-spawn mt-6 flex flex-col items-center gap-2 border-t-2 border-dashed border-[#2e3a1f] pt-4 animate-in fade-in duration-500">
-            <img
-              src={food.image}
-              alt="anime cat food"
-              className="w-32 h-32 object-cover border-2 border-[#2e3a1f] rounded-lg shadow-sm"
-            />
-            <p className="text-[12px] text-center font-bold italic">
-               "{food.food}"
-            </p>
+          <div className="mt-6 flex flex-col items-center gap-3 border-t-4 border-dashed border-[#2e3a1f] pt-6 animate-in zoom-in duration-300">
+            <div className="relative p-1 bg-[#2e3a1f] rounded-xl shadow-lg">
+              <img
+                src={food.image}
+                alt="AI Anime Cat Food"
+                className="w-48 h-48 object-cover rounded-lg border-2 border-[#c9db94]"
+              />
+            </div>
+            <div className="text-center">
+               <p className="text-[10px] uppercase tracking-tighter opacity-70">Today's Special</p>
+               <p className="text-[15px] font-black leading-tight italic">
+                  "{food.food}"
+               </p>
+            </div>
           </div>
         )}
       </div>
