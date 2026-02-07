@@ -6,7 +6,7 @@ interface Food {
   image: string
   [key: string]: any
 }
-    
+
 const QuestionDropDown = ({open, close}:any) => {
 
   const [food,setFood] = useState<Food | null>(null)
@@ -20,8 +20,18 @@ const QuestionDropDown = ({open, close}:any) => {
     setFood(null)
 
     try{
-      const res = await fetch("https://purrfect-plate-backend-1.onrender.com/generate-food")
-      const data = await res.json()
+      const res = await fetch(
+  "https://purrfect-plate-backend-1.onrender.com/generate-food",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    }
+  }
+);
+
+const data = await res.json();
+
 
       setFood(data)
     }catch(err){
