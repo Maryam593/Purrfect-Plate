@@ -55,3 +55,55 @@
   background-repeat:no-repeat;
   image-rendering:pixelated;
 } */
+/* PIXEL SHADOW BOX */
+.pixel-box{
+  box-shadow:
+    8px 8px 0px #1b2312,
+    inset -4px -4px 0px #9fb36a,
+    inset 4px 4px 0px #e3f0b8;
+}
+
+/* MODAL DROP ANIMATION */
+@keyframes drop {
+  0%{
+    transform: translateY(-200px) scaleY(0.6);
+    opacity:0;
+  }
+  60%{
+    transform: translateY(20px) scaleY(1.05);
+    opacity:1;
+  }
+  100%{
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+.animate-drop{
+  animation: drop 0.55s cubic-bezier(.2,.8,.2,1);
+}
+
+/* PIXEL IMAGE RENDER */
+.pixel-art{
+  image-rendering: pixelated;
+}
+
+/* FOOD SPAWN ANIMATION */
+@keyframes spawnFood{
+  0%{
+    transform: translateY(80px) scale(0.2);
+    opacity:0;
+  }
+  60%{
+    transform: translateY(-10px) scale(1.15);
+    opacity:1;
+  }
+  100%{
+    transform: translateY(0px) scale(1);
+  }
+}
+
+.food-spawn{
+  animation: spawnFood .6s steps(6);
+}
+
+
