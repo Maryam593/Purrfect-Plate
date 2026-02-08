@@ -63,6 +63,16 @@
     inset 4px 4px 0px #e3f0b8;
 }
 
+/* PIXELE FONT */
+.pixelete-font {
+  font-family: 'Pixelete', monospace;
+}
+
+/* PIXEL CAT GIF */
+.pixel-cat {
+  image-rendering: pixelated;
+}
+
 /* MODAL DROP ANIMATION */
 @keyframes drop {
   0%{
