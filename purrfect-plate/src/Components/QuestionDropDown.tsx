@@ -5,9 +5,15 @@ import { useState } from "react"
 interface CatFood {
   image: string
   food: string
+  healthTip: string
 }
 
-const QuestionDropDown = ({ open, close }: any) => {
+interface QuestionDropDownProps {
+  open: boolean
+  close: () => void
+}
+
+const QuestionDropDown: React.FC<QuestionDropDownProps> = ({ open, close }) => {
   const [name, setName] = useState("")
   const [breed, setBreed] = useState("")
   const [food, setFood] = useState<CatFood | null>(null)
@@ -36,16 +42,13 @@ const QuestionDropDown = ({ open, close }: any) => {
 
       const data = await res.json()
 
-      // 100% Anime Prompt Logic
-      const animeStyle = "masterpiece, 2D anime style art, studio ghibli aesthetic, cel shaded, vibrant colors, hand-drawn, no realism, no 3d, no photo";
-      const dish = data.cat.food || "tasty cat treats";
-      const finalPrompt = encodeURIComponent(`${animeStyle}, a bowl of ${dish} for a ${breed} cat`);
-      
-      const generatedImage = `https://image.pollinations.ai/prompt/${finalPrompt}?width=512&height=512&nologo=true&model=flux&seed=${Math.floor(Math.random() * 10000)}`;
-
+      // CRITICAL FIX: Use the pre-generated image URL from backend
+      // Your backend already generates the anime image using Pollinations API
+      // DO NOT generate a new image - use the one from the backend response
       setFood({
-        image: generatedImage,
-        food: dish
+        image: data.cat.image,  // Use the image URL from backend
+        food: data.cat.food,
+        healthTip: data.cat.health_tip
       })
 
     } catch (err) {
@@ -110,6 +113,11 @@ const QuestionDropDown = ({ open, close }: any) => {
             <div className="bg-[#2e3a1f] text-[#c9db94] px-4 py-1 rounded-full text-[12px] font-bold shadow-md">
                {food.food}
             </div>
+            {food.healthTip && (
+              <div className="text-center text-[10px] text-[#2e3a1f]/70 italic">
+                💡 {food.healthTip}
+              </div>
+            )}
           </div>
         )}
       </div>

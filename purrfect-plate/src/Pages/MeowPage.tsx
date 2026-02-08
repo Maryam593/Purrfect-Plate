@@ -28,11 +28,15 @@ export default function MeowPage(){
     },600) // adjust according to sound length
   }
 
+  const closeMenu = () => {
+    setOpen(false)
+  }
+
   return(
     <div className="flex flex-col items-center h-screen pt-32 gap-6">
 
       <MeowButton toggle={toggleMenu}/>
-      <CurtainMenu open={open}/>
+      <CurtainMenu open={open} close={closeMenu}/>
 
     </div>
   )
