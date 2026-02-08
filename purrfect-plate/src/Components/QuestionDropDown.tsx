@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface CatFood {
   image: string
@@ -18,6 +18,8 @@ const QuestionDropDown: React.FC<QuestionDropDownProps> = ({ open, close }) => {
   const [breed, setBreed] = useState("")
   const [food, setFood] = useState<CatFood | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showCountdown, setShowCountdown] = useState(false)
+  const [countdown, setCountdown] = useState(3)
 
   if (!open) return null
 
@@ -29,6 +31,8 @@ const QuestionDropDown: React.FC<QuestionDropDownProps> = ({ open, close }) => {
 
     setLoading(true)
     setFood(null)
+    setShowCountdown(false)
+    setCountdown(3)
 
     try {
       const res = await fetch(
@@ -42,19 +46,34 @@ const QuestionDropDown: React.FC<QuestionDropDownProps> = ({ open, close }) => {
 
       const data = await res.json()
 
-      // CRITICAL FIX: Use the pre-generated image URL from backend
-      // Your backend already generates the anime image using Pollinations API
-      // DO NOT generate a new image - use the one from the backend response
-      setFood({
-        image: data.cat.image,  // Use the image URL from backend
-        food: data.cat.food,
-        healthTip: data.cat.health_tip
-      })
+      // Chef is cooking - show cooking animation for 2 seconds
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Start countdown
+      setShowCountdown(true)
+      const countdownInterval = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval)
+            // CRITICAL FIX: Use the pre-generated image URL from backend
+            // Your backend already generates the anime image using Pollinations API
+            // DO NOT generate a new image - use the one from the backend response
+            setFood({
+              image: data.cat.image,  // Use the image URL from backend
+              food: data.cat.food,
+              healthTip: data.cat.health_tip
+            })
+            setShowCountdown(false)
+            setLoading(false)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
 
     } catch (err) {
       console.log("Error:", err)
       alert("Check if Render Backend is active!")
-    } finally {
       setLoading(false)
     }
   }
@@ -94,6 +113,43 @@ const QuestionDropDown: React.FC<QuestionDropDownProps> = ({ open, close }) => {
         
         <p className="text-center cursor-pointer text-[10px] font-bold hover:underline" onClick={close}>[ CLOSE ]</p>
 
+        {/* Chef Cooking Animation */}
+        {loading && !showCountdown && (
+          <div className="mt-6 flex flex-col items-center gap-4 border-t-4 border-dashed border-[#2e3a1f] pt-6 animate-in zoom-in">
+            <div className="text-center">
+              <p className="text-[14px] font-bold mb-2">👨‍🍳 Chef is cooking...</p>
+              <p className="text-[10px] text-[#2e3a1f]/70 italic">Please wait while we prepare your cat's meal</p>
+            </div>
+            <div className="relative p-1 bg-[#2e3a1f] rounded-lg">
+              <img
+                src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmV2Z2V4ZzR5ZzZ5ZzZ5ZzZ5ZzZ5ZzZ5ZzZ5ZzZ5ZzZ5ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7abB06r9KDXI3I04/giphy.gif"
+                alt="Chef cooking"
+                className="w-48 h-48 object-cover rounded border-2 border-[#c9db94]"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Countdown Animation */}
+        {showCountdown && (
+          <div className="mt-6 flex flex-col items-center gap-4 border-t-4 border-dashed border-[#2e3a1f] pt-6 animate-in zoom-in">
+            <div className="text-center">
+              <p className="text-[14px] font-bold mb-2">🍽️ Food is ready in...</p>
+              <div className="text-[48px] font-bold text-[#2e3a1f] animate-bounce">
+                {countdown}
+              </div>
+            </div>
+            <div className="relative p-1 bg-[#2e3a1f] rounded-lg">
+              <img
+                src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmV2Z2V4ZzR5ZzZ5ZzZ5ZzZ5ZzZ5ZzZ5ZzZ5ZzZ5ZzZ5ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7abB06r9KDXI3I04/giphy.gif"
+                alt="Chef cooking"
+                className="w-48 h-48 object-cover rounded border-2 border-[#c9db94]"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Generated Food */}
         {food && (
           <div className="mt-6 flex flex-col items-center gap-3 border-t-4 border-dashed border-[#2e3a1f] pt-6 animate-in zoom-in">
             <div className="relative p-1 bg-[#2e3a1f] rounded-lg">
